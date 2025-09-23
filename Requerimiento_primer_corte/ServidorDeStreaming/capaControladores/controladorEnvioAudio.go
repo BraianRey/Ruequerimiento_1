@@ -16,5 +16,4 @@ func (s *ControladorServidor) EnviarCancionMedianteStream(req *pb.PeticionDTO, s
 		func(data []byte) error {
 			return stream.Send(&pb.FragmentoCancion{Data: data})
 		})
-	//sexo
 }
