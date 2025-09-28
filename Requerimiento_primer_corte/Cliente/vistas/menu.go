@@ -93,8 +93,8 @@ func MostrarMenuPrincipal(clientStream pbStream.AudioServiceClient, clientCancio
 			fmt.Println("Error al obtener detalles o canción no encontrada.")
 			continue
 		}
-		fmt.Printf("\nDetalles de la canción:\nTítulo: %s\nArtista: %s\nAño: %d\nDuración: %s\nGénero: %s\n",
-			respDetalle.Titulo, respDetalle.Artista, respDetalle.Anio, respDetalle.Duracion, respDetalle.Genero.Nombre)
+		fmt.Printf("\nDetalles de la canción:\nTítulo: %s\nArtista: %s\nAlbum: %s\nAño: %d\nDuración: %s\nGénero: %s\n",
+			respDetalle.Titulo, respDetalle.Artista, respDetalle.Album, respDetalle.Anio, respDetalle.Duracion, respDetalle.Genero.Nombre)
 
 		// Paso 4: Opción de reproducir o volver
 		for {

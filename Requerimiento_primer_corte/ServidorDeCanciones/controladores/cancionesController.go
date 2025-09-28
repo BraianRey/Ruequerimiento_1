@@ -41,6 +41,7 @@ func (c *CancionesController) ListarCancionesPorGenero(ctx context.Context, in *
 			Id:       int32(cgo.ID),
 			Titulo:   cgo.Titulo,
 			Artista:  cgo.Artista,
+			Album:    cgo.Album,
 			Anio:     int32(cgo.Anio),
 			Duracion: cgo.Duracion,
 			Genero: &pb.Genero{
@@ -62,6 +63,7 @@ func (c *CancionesController) ObtenerDetallesCancion(ctx context.Context, in *pb
 		Id:       int32(cgo.ID),
 		Titulo:   cgo.Titulo,
 		Artista:  cgo.Artista,
+		Album:    cgo.Album,
 		Anio:     int32(cgo.Anio),
 		Duracion: cgo.Duracion,
 		Genero: &pb.Genero{

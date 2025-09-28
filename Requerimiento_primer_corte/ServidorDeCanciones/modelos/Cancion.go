@@ -5,6 +5,7 @@ type Cancion struct {
 	ID       int
 	Titulo   string
 	Artista  string
+	Album    string
 	Anio     int
 	Duracion string
 	Genero   Genero

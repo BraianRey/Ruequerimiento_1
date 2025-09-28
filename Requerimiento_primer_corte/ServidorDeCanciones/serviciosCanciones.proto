@@ -14,9 +14,10 @@ message Cancion {
   int32 id = 1;
   string titulo = 2;
   string artista = 3;
-  int32 anio = 4;
-  string duracion = 5;
-  Genero genero = 6;
+  string album = 4;
+  int32 anio = 5;
+  string duracion = 6;
+  Genero genero = 7;
 }
 
 message ListaGeneros {

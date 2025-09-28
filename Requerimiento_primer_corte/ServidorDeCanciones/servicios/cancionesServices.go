@@ -37,6 +37,7 @@ func (s *CancionesServiceServer) ListarCancionesPorGenero(ctx context.Context, i
 				Id:       int32(c.ID),
 				Titulo:   c.Titulo,
 				Artista:  c.Artista,
+				Album:    c.Album,
 				Anio:     int32(c.Anio),
 				Duracion: c.Duracion,
 				Genero: &pb.Genero{
@@ -57,6 +58,7 @@ func (s *CancionesServiceServer) ObtenerDetallesCancion(ctx context.Context, in 
 				Id:       int32(c.ID),
 				Titulo:   c.Titulo,
 				Artista:  c.Artista,
+				Album:    c.Album,
 				Anio:     int32(c.Anio),
 				Duracion: c.Duracion,
 				Genero: &pb.Genero{

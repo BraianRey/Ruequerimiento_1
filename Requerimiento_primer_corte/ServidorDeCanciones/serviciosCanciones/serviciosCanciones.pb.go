@@ -79,9 +79,10 @@ type Cancion struct {
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Titulo        string                 `protobuf:"bytes,2,opt,name=titulo,proto3" json:"titulo,omitempty"`
 	Artista       string                 `protobuf:"bytes,3,opt,name=artista,proto3" json:"artista,omitempty"`
-	Anio          int32                  `protobuf:"varint,4,opt,name=anio,proto3" json:"anio,omitempty"`
-	Duracion      string                 `protobuf:"bytes,5,opt,name=duracion,proto3" json:"duracion,omitempty"`
-	Genero        *Genero                `protobuf:"bytes,6,opt,name=genero,proto3" json:"genero,omitempty"`
+	Album         string                 `protobuf:"bytes,4,opt,name=album,proto3" json:"album,omitempty"`
+	Anio          int32                  `protobuf:"varint,5,opt,name=anio,proto3" json:"anio,omitempty"`
+	Duracion      string                 `protobuf:"bytes,6,opt,name=duracion,proto3" json:"duracion,omitempty"`
+	Genero        *Genero                `protobuf:"bytes,7,opt,name=genero,proto3" json:"genero,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -133,6 +134,13 @@ func (x *Cancion) GetTitulo() string {
 func (x *Cancion) GetArtista() string {
 	if x != nil {
 		return x.Artista
+	}
+	return ""
+}
+
+func (x *Cancion) GetAlbum() string {
+	if x != nil {
+		return x.Album
 	}
 	return ""
 }
@@ -341,14 +349,15 @@ const file_serviciosCanciones_proto_rawDesc = "" +
 	"\x18serviciosCanciones.proto\x12\tservicios\x1a\x1bgoogle/protobuf/empty.proto\"0\n" +
 	"\x06Genero\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x16\n" +
-	"\x06nombre\x18\x02 \x01(\tR\x06nombre\"\xa6\x01\n" +
+	"\x06nombre\x18\x02 \x01(\tR\x06nombre\"\xbc\x01\n" +
 	"\aCancion\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x16\n" +
 	"\x06titulo\x18\x02 \x01(\tR\x06titulo\x12\x18\n" +
-	"\aartista\x18\x03 \x01(\tR\aartista\x12\x12\n" +
-	"\x04anio\x18\x04 \x01(\x05R\x04anio\x12\x1a\n" +
-	"\bduracion\x18\x05 \x01(\tR\bduracion\x12)\n" +
-	"\x06genero\x18\x06 \x01(\v2\x11.servicios.GeneroR\x06genero\";\n" +
+	"\aartista\x18\x03 \x01(\tR\aartista\x12\x14\n" +
+	"\x05album\x18\x04 \x01(\tR\x05album\x12\x12\n" +
+	"\x04anio\x18\x05 \x01(\x05R\x04anio\x12\x1a\n" +
+	"\bduracion\x18\x06 \x01(\tR\bduracion\x12)\n" +
+	"\x06genero\x18\a \x01(\v2\x11.servicios.GeneroR\x06genero\";\n" +
 	"\fListaGeneros\x12+\n" +
 	"\ageneros\x18\x01 \x03(\v2\x11.servicios.GeneroR\ageneros\"\x1a\n" +
 	"\bGeneroId\x12\x0e\n" +
