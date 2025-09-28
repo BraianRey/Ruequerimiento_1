@@ -1,9 +1,11 @@
 package modelos
 
+// Cancion representa una canción con sus detalles
 type Cancion struct {
-	Titulo     string
-	Tamanio    int
-	Url        string
-	EsActivada bool
-	Genero     Genero
+	ID       int
+	Titulo   string
+	Artista  string
+	Anio     int
+	Duracion string
+	Genero   Genero
 }

@@ -6,46 +6,76 @@ import (
 	"log"
 	"time"
 
-	pb "servidor.local/grpc-servidorstream/serviciosCancion"
+	pb "servidor.local/grpc-servidorstream/serviciosStreaming"
 
 	"github.com/faiface/beep"
 	"github.com/faiface/beep/mp3"
 	"github.com/faiface/beep/speaker"
 )
 
-func DecodificarReproducir(reader io.Reader, canalSincronizacion chan struct{}) {
+// DecodificarReproducir: decodifica desde el reader y reproduce hasta EOF o hasta que llegue stop.
+func DecodificarReproducir(reader io.Reader, canalStop <-chan struct{}, canalSincronizacion chan struct{}) {
+	// decodificar el stream de audio
 	streamer, format, err := mp3.Decode(io.NopCloser(reader))
 	if err != nil {
-		log.Fatalf("error decodificando MP#: %v", err)
+		log.Fatalf("error decodificando MP3: %v", err)
 	}
 
+	// inicializar el altavoz
 	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/2))
 
+	// callback que se dispara al terminar la reproducción natural
+	done := make(chan struct{})
 	speaker.Play(beep.Seq(streamer, beep.Callback(func() {
-		close(canalSincronizacion)
+		close(done)
 	})))
+
+	// goroutine que escucha stop o finalización natural
+	go func() {
+		select {
+		case <-canalStop:
+			// detener inmediatamente
+			speaker.Clear()
+			streamer.Close()
+			close(canalSincronizacion)
+		case <-done:
+			// terminó la canción sola
+			close(canalSincronizacion)
+		}
+	}()
 }
 
-func RecibirCancion(stream pb.AudioService_EnviarCancionMedianteStreamClient, writer *io.PipeWriter, canalSincronizacion chan struct{}) {
+// RecibirCancion: recibe los fragmentos del stream y los escribe al pipe.
+// Se interrumpe si canalStop se cierra.
+func RecibirCancion(stream pb.AudioService_EnviarCancionMedianteStreamClient, writer *io.PipeWriter, canalStop <-chan struct{}, canalSincronizacion chan struct{}) {
 	noFragmento := 0
+	defer writer.Close()
+
 	for {
-		fragmento, err := stream.Recv()
-		if err == io.EOF {
-			fmt.Println("Canción recibida completa.")
-			writer.Close()
-			break
-		}
-		if err != nil {
-			log.Fatalf("Error recibiendo chunk: %v", err)
-		}
-		noFragmento++
-		fmt.Printf("\n FRagmento #%d recibido (%d bytes) reproduciendo ...", noFragmento, len(fragmento.Data))
-		if _, err := writer.Write(fragmento.Data); err != nil {
-			log.Printf("Error escribiendo en pipe: %v", err)
-			break
+		select {
+		case <-canalStop:
+			fmt.Println("\nRecibirCancion: stop recibido, cerrando writer.")
+			return
+		default:
+			fragmento, err := stream.Recv()
+			if err == io.EOF {
+				fmt.Println("Canción recibida completa.")
+				return
+			}
+			if err != nil {
+				log.Printf("Error recibiendo chunk: %v", err)
+				return
+			}
+			noFragmento++
+			fmt.Printf("\n Fragmento #%d recibido (%d bytes) reproduciendo ...", noFragmento, len(fragmento.Data))
+			if _, err := writer.Write(fragmento.Data); err != nil {
+				log.Printf("Error escribiendo en pipe: %v", err)
+				return
+			}
 		}
 	}
-	//Esperar hasta que termine la reproducción
+
+	// al terminar, esperar fin de reproducción
 	<-canalSincronizacion
 	fmt.Println("✓ Reproducción finalizada.")
 }

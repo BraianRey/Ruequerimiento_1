@@ -7,7 +7,9 @@ import (
 	"os"
 )
 
+// StreamAudioFile lee un archivo de audio y envía sus fragmentos usando la función proporcionada
 func StreamAudioFile(tituloCancion string, funcionParaEnviarFragmento func([]byte) error) error {
+	tituloCancion = tituloCancion + ".mp3"
 	log.Printf("Canción solicitada: %s", tituloCancion)
 	file, err := os.Open("canciones/" + tituloCancion)
 	if err != nil {
@@ -15,6 +17,7 @@ func StreamAudioFile(tituloCancion string, funcionParaEnviarFragmento func([]byt
 	}
 	defer file.Close()
 
+	// leer y enviar en fragmentos
 	buffer := make([]byte, 64*1024) // 64 KB se envian por fragmento
 	fragmento := 0
 

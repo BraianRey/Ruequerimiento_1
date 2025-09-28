@@ -7,21 +7,29 @@ import (
 
 	menu "cliente.local/grpc-cliente/vistas"
 	"google.golang.org/grpc"
-	pb "servidor.local/grpc-servidorstream/serviciosCancion"
+	pbCancion "servidor.local/grpc-servidorcanciones/serviciosCanciones"
+	pbStream "servidor.local/grpc-servidorstream/serviciosStreaming"
 )
 
 func main() {
-
-	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+	// Conexión al servidor de streaming
+	connStream, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer conn.Close()
+	defer connStream.Close()
+	clientStream := pbStream.NewAudioServiceClient(connStream)
 
-	client := pb.NewAudioServiceClient(conn)
+	// Conexión al servidor de canciones
+	connCancion, err := grpc.Dial("localhost:9000", grpc.WithInsecure())
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer connCancion.Close()
+	clientCancion := pbCancion.NewCancionesServiceClient(connCancion)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
-	menu.MostrarMenuPrincipal(client, ctx)
+	menu.MostrarMenuPrincipal(clientStream, clientCancion, ctx)
 }

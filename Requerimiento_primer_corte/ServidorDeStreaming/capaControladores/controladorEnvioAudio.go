@@ -2,9 +2,10 @@ package capacontroladores
 
 import (
 	capafachadaservices "servidor.local/grpc-servidorstream/capaFachadaServices"
-	pb "servidor.local/grpc-servidorstream/serviciosCancion"
+	pb "servidor.local/grpc-servidorstream/serviciosStreaming"
 )
 
+// ControladorServidor implementa el servicio de streaming de audio
 type ControladorServidor struct {
 	pb.UnimplementedAudioServiceServer
 }

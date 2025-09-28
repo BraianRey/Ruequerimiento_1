@@ -7,7 +7,7 @@ import (
 
 	"google.golang.org/grpc"
 	capacontroladores "servidor.local/grpc-servidorstream/capaControladores"
-	pb "servidor.local/grpc-servidorstream/serviciosCancion"
+	pb "servidor.local/grpc-servidorstream/serviciosStreaming"
 )
 
 func main() {
