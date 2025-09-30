@@ -34,6 +34,7 @@ func MostrarMenuPrincipal(clientStream pbStream.AudioServiceClient, clientCancio
 		}
 
 		// Paso 1: Listar géneros
+		// obtener géneros desde el servidor
 		respGeneros, err := clientCancion.ListarGeneros(ctx, &emptypb.Empty{})
 		if err != nil {
 			fmt.Println("Error al obtener géneros:", err)
@@ -49,10 +50,12 @@ func MostrarMenuPrincipal(clientStream pbStream.AudioServiceClient, clientCancio
 		}
 		fmt.Print("Seleccione el género por número (o 0 para volver): ")
 		genStr, _ := readerInput.ReadString('\n')
+		// limpiar entrada
 		genStr = strings.TrimSpace(genStr)
 		if genStr == "0" {
 			continue
 		}
+		// Validar selección
 		genIdx, err := strconv.Atoi(genStr)
 		if err != nil || genIdx < 1 || genIdx > len(respGeneros.Generos) {
 			fmt.Println("Opción inválida.")
@@ -61,6 +64,7 @@ func MostrarMenuPrincipal(clientStream pbStream.AudioServiceClient, clientCancio
 		idGenero := respGeneros.Generos[genIdx-1].Id
 
 		// Paso 2: Listar canciones del género seleccionado
+		// obtener canciones por género seleccionado
 		respCanciones, err := clientCancion.ListarCancionesPorGenero(ctx, &pbCancion.GeneroId{Id: idGenero})
 		if err != nil {
 			fmt.Println("Error al obtener canciones:", err)
@@ -71,6 +75,7 @@ func MostrarMenuPrincipal(clientStream pbStream.AudioServiceClient, clientCancio
 			continue
 		}
 		fmt.Println("\nCanciones disponibles:")
+		// Listar canciones con índice
 		for i, c := range respCanciones.Canciones {
 			fmt.Printf("%d) %s - %s\n", i+1, c.Titulo, c.Artista)
 		}
@@ -80,14 +85,17 @@ func MostrarMenuPrincipal(clientStream pbStream.AudioServiceClient, clientCancio
 		if cancStr == "0" {
 			continue
 		}
+		// Validar selección
 		cancIdx, err := strconv.Atoi(cancStr)
 		if err != nil || cancIdx < 1 || cancIdx > len(respCanciones.Canciones) {
 			fmt.Println("Opción inválida.")
 			continue
 		}
+		// obtener ID de la canción seleccionada
 		idCancion := respCanciones.Canciones[cancIdx-1].Id
 
 		// Paso 3: Mostrar información de la canción seleccionada
+		// obtener detalles de la canción
 		respDetalle, err := clientCancion.ObtenerDetallesCancion(ctx, &pbCancion.CancionId{Id: idCancion})
 		if err != nil || respDetalle == nil {
 			fmt.Println("Error al obtener detalles o canción no encontrada.")
@@ -105,12 +113,16 @@ func MostrarMenuPrincipal(clientStream pbStream.AudioServiceClient, clientCancio
 				break
 			}
 			if opc == "1" {
+				// Preparar stream y canales
 				stream, err := clientStream.EnviarCancionMedianteStream(ctx, &pbStream.PeticionDTO{Titulo: respDetalle.Titulo})
 				if err != nil {
 					log.Fatal(err)
 				}
+				// pipe para conectar recepción y reproducción
 				readerPipe, writerPipe := io.Pipe()
+				// canal para detener reproducción
 				canalStop := make(chan struct{})
+				// canal para sincronizar cierre de goroutines
 				canalSincronizacion := make(chan struct{})
 
 				// Goroutine para reproducir

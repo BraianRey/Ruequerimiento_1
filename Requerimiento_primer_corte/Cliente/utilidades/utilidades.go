@@ -16,7 +16,7 @@ import (
 
 // package-level sync.Once para inicializar speaker solo 1 vez
 var speakerInitOnce sync.Once
-var speakerSampleRate beep.SampleRate // sampleRate fijo para el speaker
+var speakerSampleRate beep.SampleRate // se usa para resampling si es necesario
 
 // DecodificarReproducir: decodifica desde el reader y reproduce hasta EOF o hasta que llegue stop.
 // Usa un sync.Once local para cerrar canalSincronizacion solo 1 vez y evita panics por double close.
@@ -26,7 +26,7 @@ func DecodificarReproducir(reader io.Reader, canalStop <-chan struct{}, canalSin
 	streamer, _, err := mp3.Decode(io.NopCloser(reader))
 	if err != nil {
 		log.Printf("error decodificando MP3: %v", err)
-		safeClose(canalSincronizacion)
+		safeClose(canalSincronizacion) // cerrar canalSincronizacion para evitar deadlock en RecibirCancion
 		return
 	}
 
@@ -62,13 +62,13 @@ func DecodificarReproducir(reader io.Reader, canalStop <-chan struct{}, canalSin
 		// si llega stop, limpiar y cerrar streamer
 		case <-canalStop:
 			log.Println("DecodificarReproducir: stop recibido, deteniendo reproducción.")
-			speaker.Clear()
-			_ = streamer.Close()
+			speaker.Clear()      // limpiar cola de reproducción
+			_ = streamer.Close() // cerrar streamer para liberar recursos
 			closeSync()
 		// si termina naturalmente, cerrar canalSincronizacion
 		case <-done:
 			log.Println("DecodificarReproducir: reproducción terminó naturalmente.")
-			closeSync()
+			closeSync() // cerrar canalSincronizacion
 		}
 	}()
 }
@@ -86,7 +86,8 @@ func safeClose(ch chan struct{}) {
 // RecibirCancion: recibe los fragmentos del stream y los escribe al pipe.
 func RecibirCancion(stream pb.AudioService_EnviarCancionMedianteStreamClient, writer *io.PipeWriter, canalStop <-chan struct{}, canalSincronizacion chan struct{}) {
 	noFragmento := 0
-	var once sync.Once
+	var once sync.Once // para cerrar writer solo 1 vez
+	// función para cerrar writer de forma segura
 	closeWriter := func() {
 		once.Do(func() { _ = writer.Close() })
 	}

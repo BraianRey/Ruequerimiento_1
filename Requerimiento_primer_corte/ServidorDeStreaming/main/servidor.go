@@ -12,11 +12,13 @@ import (
 
 func main() {
 
+	// Escuchar en el puerto 50051
 	listener, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatalf("Error escuchando en el puerto: %v", err)
 	}
 
+	// Crear un servidor gRPC
 	grpcServer := grpc.NewServer()
 
 	// Se registra el controlador que ofrece el procedimiento remoto

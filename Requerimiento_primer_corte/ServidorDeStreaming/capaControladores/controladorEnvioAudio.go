@@ -14,6 +14,7 @@ type ControladorServidor struct {
 func (s *ControladorServidor) EnviarCancionMedianteStream(req *pb.PeticionDTO, stream pb.AudioService_EnviarCancionMedianteStreamServer) error {
 	return capafachadaservices.StreamAudioFile(
 		req.Titulo,
+		// función para enviar fragmento al cliente
 		func(data []byte) error {
 			return stream.Send(&pb.FragmentoCancion{Data: data})
 		})
