@@ -11,10 +11,12 @@ import (
 func StreamAudioFile(tituloCancion string, funcionParaEnviarFragmento func([]byte) error) error {
 	tituloCancion = tituloCancion + ".mp3"
 	log.Printf("Canción solicitada: %s", tituloCancion)
+	// abrir el archivo de audio
 	file, err := os.Open("canciones/" + tituloCancion)
 	if err != nil {
 		return fmt.Errorf("no se pudo abrir el archivo: %w", err)
 	}
+	// asegurar el cierre del archivo al finalizar
 	defer file.Close()
 
 	// leer y enviar en fragmentos

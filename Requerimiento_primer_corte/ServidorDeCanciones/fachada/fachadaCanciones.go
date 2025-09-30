@@ -8,8 +8,8 @@ import (
 
 // FachadaCanciones proporciona una interfaz simplificada para acceder a la lógica de negocio relacionada con las canciones y géneros
 type FachadaCanciones struct {
-	Generos   []modelos.Genero
-	Canciones []modelos.Cancion
+	Generos   []modelos.Genero  // lista de géneros disponibles
+	Canciones []modelos.Cancion // lista de canciones disponibles
 }
 
 // constructor de la fachada de canciones
@@ -103,8 +103,8 @@ func NuevaFachadaCanciones() *FachadaCanciones {
 		},
 	}
 	return &FachadaCanciones{
-		Generos:   generos,
-		Canciones: canciones,
+		Generos:   generos,   // inicializar géneros
+		Canciones: canciones, // inicializar canciones
 	}
 }
 

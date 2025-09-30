@@ -21,7 +21,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("No se pudo escuchar en %s: %v", addr, err)
 	}
+	// crear servidor gRPC y registrar el servicio de canciones
 	grpcServer := grpc.NewServer()
+	// registrar el servicio de canciones con su controlador
 	pb.RegisterCancionesServiceServer(grpcServer, controladores.NuevoCancionesController(fachadaCanciones))
 
 	log.Printf("ServidorDeCanciones escuchando en %s (gRPC)", addr)
