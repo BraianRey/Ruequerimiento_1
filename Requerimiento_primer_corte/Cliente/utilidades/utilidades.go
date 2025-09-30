@@ -23,7 +23,7 @@ var speakerSampleRate beep.SampleRate // se usa para resampling si es necesario
 // Realiza resampling si el sampleRate de la canción no coincide con el usado en speaker.
 func DecodificarReproducir(reader io.Reader, canalStop <-chan struct{}, canalSincronizacion chan struct{}) {
 	// decodificar el stream de audio
-	streamer, _, err := mp3.Decode(io.NopCloser(reader))
+	streamer, format, err := mp3.Decode(io.NopCloser(reader))
 	if err != nil {
 		log.Printf("error decodificando MP3: %v", err)
 		safeClose(canalSincronizacion) // cerrar canalSincronizacion para evitar deadlock en RecibirCancion
@@ -43,8 +43,11 @@ func DecodificarReproducir(reader io.Reader, canalStop <-chan struct{}, canalSin
 		}
 	})
 
-	// si el sampleRate del audio no coincide con el del speaker, hacer resampling
 	var streamerToPlay beep.Streamer = streamer
+	// si el sampleRate del audio no coincide con el del speaker, hacer resampling
+	if format.SampleRate != speakerSampleRate {
+		streamerToPlay = beep.Resample(4, format.SampleRate, speakerSampleRate, streamer)
+	}
 
 	// callback que se dispara al terminar la reproducción natural
 	done := make(chan struct{})
